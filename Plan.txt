@@ -1,0 +1,70 @@
+1. Identifiers are not model inputs 
+    application_id 
+
+    financial_features (input to model):
+        - age (int)
+        - employment_status (string) — e.g. employed, self-employed, unemployed
+        - years_at_job (int)
+        - income (float) — annual income
+        - monthly_expenses (float)
+        - loan_amount (float)
+        - loan_term_months (int)
+        - credit_score (int) — e.g. 300–850
+        - existing_loans_count (int)
+        - existing_loan_total_balance (float)
+        - payment_history_30d_count (int) — count of 30-day delinquencies
+        - home_owner (bool or 0/1)
+        - marital_status (string)
+        - education_level (string)
+        - purpose (string) — e.g., business, education, home_improvement
+
+2. How much data do I need? 
+    1000 - 5000 rows 
+
+3. Data quality, privacy and PII 
+    Note: Avoid real data like (full name, address, phone number, NID/SSN, Email)
+    - Maintain data quality: no missing values, consistent ranges, valid data types 
+    - Balance classes: means:- your 'approved' vs 'rejected' samples should be roughly
+    even (50% approved, 50% rejected)
+        - If 95% are 'approved', the mode just learns to always predict 'approved' and that's useless.
+
+    - Let's see what balance classes are: 
+    When we take sampe from real world, the loan approved:reject ration can 05:95,
+    but when we train a machine we can't feed it that, 95% of them get rejected that will 
+    be biased balanced. So, when we feed to a machine we must give it 50/50 approved/reject data
+    that means, 50% of chance to get approved or rejected. If we train a model with 50/50 approved/reject 
+    caused data, after training if we give a single sample data the chance of approved/reject will be 50/50.
+    after training if we give the same input of 5:95 we will get 5:95 in output not because machine is biased
+    but it is because machine learns true patterns. 
+
+
+
+4. How to get or generate data 
+    - Synthetic generation - programmatically create data that follows realistic distribution.
+    Quick synthetic plan: 
+        - Sample income from log-normal distribution 
+        - credit_score_total_balance correlated with existing_loans_count 
+    - label - apply a rule + noise, approve if create_score > 68 and dti_ratio < 0.4 else reject, 
+            - flip some labels randomly to simulate human variation. 
+
+5. Preprocessing & train/test split 
+    - Clean missing values: drop or impute (median for numeric, mode for categorical)
+    - Categorical encoding:
+        - Small cardinality → One-Hot
+        - Larger → Target-encoding or embedding (later)
+    - Scale numeric: StandardScaler or MinMax for many models (tree models don’t need scaling).
+    - Train/test split: common split 80% train / 20% test. Also keep a validation set or use cross-validation.
+    - Time-based split: if data is time-sequenced, use an earlier period for train and later for test.
+
+6. Evaluation metrics (what to watch)
+    - Accuracy — simple but misleading on imbalanced data.
+    - Precision / Recall — for approval, maybe precision matters (avoid false approvals) or recall depends on business objective.
+    - F1 Score — harmonic mean of precision & recall.
+    - ROC AUC — good global metric for probability ranking.
+    - Confusion Matrix — inspect false positives/negatives.
+    - Calibration — are predicted probabilities realistic? (Important for risk.)
+    - Business rule: often banks prefer conservative models — tune cutoff so false approvals are very low.
+
+
+
+
